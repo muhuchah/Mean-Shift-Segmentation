@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-def load_image(image, title='Just an image'):
+def save_image(image, title='Just an image'):
     plt.imshow(image)
     plt.title(title)
     plt.axis('off')

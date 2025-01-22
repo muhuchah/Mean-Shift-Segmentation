@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from skimage import io
 
 
-from utils import load_image
+from utils import save_image 
 
 
 if __name__ == "__main__":
@@ -13,4 +13,4 @@ if __name__ == "__main__":
     # Normalize pixel values to [0, 1]
     image = image / 255.0
 
-    load_image(image, title="Original Image")
+    save_image(image, title="Original Image")
