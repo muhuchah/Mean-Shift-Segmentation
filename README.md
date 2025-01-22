@@ -14,13 +14,13 @@ Features
 To run this project, you need the following Python libraries:
 
 - `numpy`
-- `scikit-learn
+- `scikit-learn`
 - `scikit-image`
 - `matplotlib`
 
 You can install the required libraries using pip:
 ```bash
-    pip install numpy scikit-learn scikit-image matplotlib
+pip install numpy scikit-learn scikit-image matplotlib
 ```
 
 # Usage
@@ -28,7 +28,7 @@ Place your image in the same directory as the script and name it input.jpg.
 
 Run the script:
 ```bash
-    python mean_shift.py
+python mean_shift.py
 ```
 
 The script will:
