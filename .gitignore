@@ -171,4 +171,4 @@ cython_debug/
 .pypirc
 
 # My Images
-.jpg
+*.jpg
