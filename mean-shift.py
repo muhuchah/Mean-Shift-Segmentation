@@ -1,11 +1,8 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from skimage import io
 from sklearn.neighbors import NearestNeighbors
 from sklearn.metrics import pairwise_distances_argmin_min
-
-
-from utils import save_image 
+from skimage import io
+import matplotlib.pyplot as plt
 
 
 def feature_space(image):
@@ -23,7 +20,7 @@ def feature_space(image):
     # Normalize spatial coordinates to [0, 1]
     X_spatial = X_spatial / np.max(X_spatial)
 
-    # Combine color and spatial features
+    # Combine color and spatial features to create a 5D feature space
     X = np.hstack([X_color, X_spatial])
     print("Feature matrix shape:", X.shape)
 
@@ -39,12 +36,12 @@ def mean_shift(X, bandwidth=0.1, max_iter=10, tol=1e-3):
 
     for i in range(max_iter):
         print(f"Iteration: {i + 1}")
-        
+
         new_centroids = np.zeros_like(centroids)
         for j in range(n_samples):
             # Find points within the bandwidth radius
             indices = nn.radius_neighbors([centroids[j]], return_distance=False)[0]
-            
+
             # Compute the weighted mean of neighbors
             neighbors = centroids[indices]
             new_centroids[j] = np.mean(neighbors, axis=0)
@@ -58,6 +55,13 @@ def mean_shift(X, bandwidth=0.1, max_iter=10, tol=1e-3):
         centroids = new_centroids
 
     return centroids
+
+
+def save_image(image, title="Image"):
+    plt.imshow(image)
+    plt.title(title)
+    plt.axis('off')
+    plt.show()
 
 
 if __name__ == "__main__":
@@ -83,8 +87,12 @@ if __name__ == "__main__":
     # Reshape labels back to the original image shape
     segmented_image = labels.reshape(rows, cols)
 
-    # Display the segmented image
-    plt.imshow(segmented_image)
-    plt.title("Segmented Image")
-    plt.axis('off')
-    plt.show()
+    # Display the segmented image with real colors
+    segmented_colored = np.zeros_like(image)
+    for label in np.unique(labels):
+        # Get the mean color of the segment
+        mean_color = np.mean(X[labels == label, :3], axis=0)
+        # Assign the mean color to the segment
+        segmented_colored[segmented_image == label] = mean_color
+
+    save_image(segmented_colored, title="Segmented Image with Real Colors")
