@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage import io
+from sklearn.neighbors import NearestNeighbors
+from sklearn.metrics import pairwise_distances_argmin_min
 
 
 from utils import save_image 
@@ -28,6 +30,36 @@ def feature_space(image):
     return X
 
 
+def mean_shift(X, bandwidth=0.1, max_iter=10, tol=1e-3):
+    n_samples, n_features = X.shape
+    centroids = X.copy()  # Initialize centroids as the input data
+
+    # Precompute the pairwise distance matrix to save computation time
+    nn = NearestNeighbors(radius=bandwidth).fit(X)
+
+    for i in range(max_iter):
+        print(f"Iteration: {i + 1}")
+        
+        new_centroids = np.zeros_like(centroids)
+        for j in range(n_samples):
+            # Find points within the bandwidth radius
+            indices = nn.radius_neighbors([centroids[j]], return_distance=False)[0]
+            
+            # Compute the weighted mean of neighbors
+            neighbors = centroids[indices]
+            new_centroids[j] = np.mean(neighbors, axis=0)
+
+        # Check for convergence
+        shift = np.linalg.norm(new_centroids - centroids, axis=1)
+        if np.all(shift < tol):
+            print(f"Converged after {i + 1} iterations")
+            break
+
+        centroids = new_centroids
+
+    return centroids
+
+
 if __name__ == "__main__":
     image = io.imread('input.jpg')
     print("Image shape: ", image.shape)
@@ -39,3 +71,20 @@ if __name__ == "__main__":
 
     X = feature_space(image)
 
+    # Run Mean Shift
+    bandwidth = 0.1
+    centroids = mean_shift(X, bandwidth=bandwidth)
+
+    # Assign each pixel to the nearest centroid
+    labels, _ = pairwise_distances_argmin_min(X, centroids)
+
+    rows, cols, channels = image.shape
+
+    # Reshape labels back to the original image shape
+    segmented_image = labels.reshape(rows, cols)
+
+    # Display the segmented image
+    plt.imshow(segmented_image)
+    plt.title("Segmented Image")
+    plt.axis('off')
+    plt.show()
